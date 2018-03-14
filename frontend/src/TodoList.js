@@ -9,31 +9,42 @@ class TodoList extends Component {
     this.state = {
       items: [],
       itemInputFieldValue: '',
+      id: null,
+      title: null,
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.returnListElement = this.returnListElement.bind(this)
     this.deleteItem = this.deleteItem.bind(this)
+    this.fetchItems = this.fetchItems.bind(this)
   }
 
   componentDidMount() {
-    api.fetchTodoLists()
+    this.fetchItems()
+  }
+
+  fetchItems() {
+    api.fetchTodoList(2)  // ID of list to get items from is now hardcoded -> 2
       .then(function(data) {
-        console.log(data)
-      })
+        this.setState({
+          items: data.todolist_items,
+          id: data.todolist.id,
+          title: data.todolist.title,
+        })
+      }.bind(this))
   }
 
   deleteItem(key) {
     this.setState(prevState => ({
       items: prevState.items.filter(function(item) {
-        return item.key !== key
+        return item.id !== key
       })
     }))
   }
 
   returnListElement(item) {
     return (
-      <TodoItem key={item.key} title={item.title} id={item.key} deleteItem={this.deleteItem}/>
+      <TodoItem key={item.id} title={item.title} id={item.id} deleteItem={this.deleteItem}/>
     )
   }
 
@@ -64,6 +75,7 @@ class TodoList extends Component {
   render() {
     return (
       <div>
+        <h1>{this.state.title}</h1>
         <form onSubmit={this.handleSubmit}>
           <label>
             Add item:
