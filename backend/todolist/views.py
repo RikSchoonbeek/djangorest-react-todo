@@ -1,8 +1,10 @@
+from rest_framework import status
+from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
-from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
 from .models import TodoList, TodoListItem
-from .serializers import  TodoListSerializer, TodoListItemSerializer
+from .serializers import TodoListSerializer, TodoListItemSerializer
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -18,8 +20,8 @@ def todolist_list(request):
         serializer = TodoListSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt
@@ -28,7 +30,7 @@ def todolist_detail(request, pk=None):
         todolist = TodoList.objects.get(pk=pk)
         todolist_items = TodoListItem.objects.filter(todolist=todolist)
     except TodoList.DoesNotExist:
-        return HttpResponse(status=404)
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
         data = {}
@@ -40,14 +42,34 @@ def todolist_detail(request, pk=None):
 
 
 @csrf_exempt
-def create_list_item(request):
+def create_update_list_item(request):
     data = JSONParser().parse(request)
-    serializer = TodoListItemSerializer(data=data)
+    if 'id' in data:  # Item to update has been send
+        item_pk = data['id']
+        try:
+            list_item = TodoListItem.objects.get(pk=item_pk)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = TodoListItemSerializer(list_item, data=data)
+    else:
+        serializer = TodoListItemSerializer(data=data)
+
     if serializer.is_valid():
         serializer.save()
-        return JsonResponse(serializer.data, status=201)
-    return JsonResponse(serializer.errors, status=400)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# def delete_list_item
+@api_view(http_method_names=['GET'])
+def todolistitem_delete(request, item_pk):
+    try:
+        list_item = TodoListItem.objects.get(pk=item_pk)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    list_item.delete()
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 

@@ -9,14 +9,15 @@ class TodoList extends Component {
     this.state = {
       items: [],
       itemInputFieldValue: '',
-      id: null,
-      title: null,
+      editId: null
     }
     this.handleChange = this.handleChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleAddSubmit = this.handleAddSubmit.bind(this)
     this.returnListElement = this.returnListElement.bind(this)
     this.deleteItem = this.deleteItem.bind(this)
     this.fetchItems = this.fetchItems.bind(this)
+    this.handleItemEditClick = this.handleItemEditClick.bind(this)
+    this.handleItemEditSubmit = this.handleItemEditSubmit.bind(this)
   }
 
   componentDidMount() {
@@ -34,17 +35,30 @@ class TodoList extends Component {
       }.bind(this))
   }
 
-  deleteItem(key) {
-    this.setState(prevState => ({
-      items: prevState.items.filter(function(item) {
-        return item.id !== key
-      })
-    }))
+  deleteItem(id) {
+    api.deleteTodoListItem(id)
+      .then(function(status) {
+        if (status === 204) {
+            this.setState(prevState => ({
+              items: prevState.items.filter(item => item.id !== id) }))
+            console.log("Item successfully deleted.")
+        } else if (status === 404) {
+            console.log("The item that you wanted to delete could not be found.")
+        } else {
+            console.log("An error occurred while trying to delete the item.")
+        }
+        }.bind(this))
   }
 
   returnListElement(item) {
     return (
-      <TodoItem key={item.id} title={item.title} id={item.id} deleteItem={this.deleteItem}/>
+      <TodoItem key={item.id}
+                title={item.title}
+                id={item.id}
+                deleteItem={this.deleteItem}
+                editId={this.state.editId}
+                handleEditClick={this.handleItemEditClick}
+                handleEditSubmit={this.handleItemEditSubmit}/>
     )
   }
 
@@ -54,28 +68,47 @@ class TodoList extends Component {
     })
   }
 
-  handleSubmit(event) {
+  handleAddSubmit(event) {
     event.preventDefault()
     let newItemTitle = document.getElementById('addItemInputField').value
     if (newItemTitle !== "") {
       let newTodoListItem = {title: newItemTitle, todolist: 2}
       api.addTodoListItem(newTodoListItem)
       .then(function(data) {
-        console.log("console.log data in TodoList")
-        console.log(data)
-        // I can now access data, which is the created object data
-        // Update state with this object
         this.setState(prevState => ({
-          items: [
-            ...prevState.items,
-            data
-          ]
-        }))
+          items: [...prevState.items, data] }))
       }.bind(this))
-      this.setState({
-        itemInputFieldValue: ''
-      })
+      this.setState({ itemInputFieldValue: '' })
       event.target.reset()
+    }
+  }
+
+  handleItemEditClick(id) {
+    this.setState({
+      editId: id
+    })
+    console.log("handleItemEdit called")
+    console.log("editId now: " + this.state.editId)
+  }
+
+  handleItemEditSubmit(id, editedItemTitle) {
+    if (editedItemTitle !== "") {
+      let editedItem = {
+        id: id,
+        title: editedItemTitle,
+        todolist: 2
+      }
+      api.addTodoListItem(editedItem)
+      this.setState(prevState => ({
+        items: prevState.items.map(function(item) {
+          if (item.id === id) {
+            return {id: id, title: editedItemTitle, todolist: 2}
+          } else {
+            return item
+          }
+        }),
+        editId: null
+      }))
     }
   }
 
@@ -83,7 +116,7 @@ class TodoList extends Component {
     return (
       <div>
         <h1>{this.state.title}</h1>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleAddSubmit}>
           <label>
             Add item:
             <input onChange={this.handleChange} type="text" id="addItemInputField" />
