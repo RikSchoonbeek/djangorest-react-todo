@@ -56,21 +56,28 @@ class TodoList extends Component {
 
   handleSubmit(event) {
     event.preventDefault()
-    if (document.getElementById('addItemInputField').value !== "") {
-      this.setState(prevState => ({
-        items: [
-          ...prevState.items,
-          {
-            key: Date.now(),
-            title: this.state.itemInputFieldValue
-          }
-        ],
+    let newItemTitle = document.getElementById('addItemInputField').value
+    if (newItemTitle !== "") {
+      let newTodoListItem = {title: newItemTitle, todolist: 2}
+      api.addTodoListItem(newTodoListItem)
+      .then(function(data) {
+        console.log("console.log data in TodoList")
+        console.log(data)
+        // I can now access data, which is the created object data
+        // Update state with this object
+        this.setState(prevState => ({
+          items: [
+            ...prevState.items,
+            data
+          ]
+        }))
+      }.bind(this))
+      this.setState({
         itemInputFieldValue: ''
-      }))
+      })
       event.target.reset()
     }
   }
-
 
   render() {
     return (
