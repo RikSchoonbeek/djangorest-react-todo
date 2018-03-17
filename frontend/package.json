@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ajv": "^6.0.0",
     "axios": "^0.18.0",
     "npm": "^5.7.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.1"
+    "react-scripts": "1.1.1",
+    "react-select": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",

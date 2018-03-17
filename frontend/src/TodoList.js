@@ -130,14 +130,10 @@ handleSearch
 
   searchingFor(term) {
     return function(itemObject) {
-      if (term === "") {
+      if (!term || itemObject.title.toLowerCase().includes(term.toLowerCase())) {
         return true
       } else {
-        if (itemObject.title.toLowerCase().includes(term.toLowerCase())) {
-        return true
-        } else {
-          return false
-        }
+        return false
       }
     }
   }
