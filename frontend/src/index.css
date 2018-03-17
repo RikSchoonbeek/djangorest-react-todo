@@ -3,3 +3,12 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+#searchResultsContainer {
+  border: 1px black solid;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 10;
+  background: white;
+}

@@ -130,10 +130,15 @@ handleSearch
 
   searchingFor(term) {
     return function(itemObject) {
-      if (!term || itemObject.title.toLowerCase().includes(term.toLowerCase())) {
-        return true
+      if (!term) {
+        document.getElementById("searchResultsContainer").style.display = "none";
       } else {
-        return false
+          document.getElementById("searchResultsContainer").style.display = "block";
+          if (itemObject.title.toLowerCase().includes(term.toLowerCase())) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   }
@@ -148,6 +153,9 @@ handleSearch
                   onChange={this.handleSearch}/>
           <button>Search</button>
         </form>
+        <table id="searchResultsContainer">
+          {this.state.items.filter(this.searchingFor(this.state.term)).map(this.returnListElement)}
+        </table>
         <form onSubmit={this.handleAddSubmit}>
           <label>
             Add item:
@@ -156,7 +164,7 @@ handleSearch
           <input type="submit" value="Add" />
         </form>
         <table>
-          {this.state.items.filter(this.searchingFor(this.state.term)).map(this.returnListElement)}
+          {this.state.items.map(this.returnListElement)}
         </table>
       </div>
     )
