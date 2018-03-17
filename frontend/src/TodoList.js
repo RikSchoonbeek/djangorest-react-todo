@@ -19,8 +19,9 @@ class TodoList extends Component {
     this.handleItemEditClick = this.handleItemEditClick.bind(this)
     this.handleItemEditSubmit = this.handleItemEditSubmit.bind(this)
     this.handleItemEditCancel = this.handleItemEditCancel.bind(this)
+    this.handleSearch = this.handleSearch.bind(this)
   }
-
+handleSearch
   componentDidMount() {
     this.fetchItems()
   }
@@ -32,6 +33,7 @@ class TodoList extends Component {
           items: data.todolist_items,
           id: data.todolist.id,
           title: data.todolist.title,
+          term: "",
         })
       }.bind(this))
   }
@@ -120,10 +122,36 @@ class TodoList extends Component {
     })
   }
 
+  handleSearch(event) {
+    this.setState({
+      term: event.target.value
+    })
+  }
+
+  searchingFor(term) {
+    return function(itemObject) {
+      if (term === "") {
+        return true
+      } else {
+        if (itemObject.title.toLowerCase().includes(term.toLowerCase())) {
+        return true
+        } else {
+          return false
+        }
+      }
+    }
+  }
+
   render() {
     return (
       <div>
         <h1>{this.state.title}</h1>
+        <form>
+          <input type="text"
+                 placeholder="Search for items..."
+                  onChange={this.handleSearch}/>
+          <button>Search</button>
+        </form>
         <form onSubmit={this.handleAddSubmit}>
           <label>
             Add item:
@@ -132,7 +160,7 @@ class TodoList extends Component {
           <input type="submit" value="Add" />
         </form>
         <table>
-          {this.state.items.map(this.returnListElement)}
+          {this.state.items.filter(this.searchingFor(this.state.term)).map(this.returnListElement)}
         </table>
       </div>
     )
