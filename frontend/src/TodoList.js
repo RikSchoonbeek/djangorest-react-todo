@@ -18,6 +18,7 @@ class TodoList extends Component {
     this.fetchItems = this.fetchItems.bind(this)
     this.handleItemEditClick = this.handleItemEditClick.bind(this)
     this.handleItemEditSubmit = this.handleItemEditSubmit.bind(this)
+    this.handleItemEditCancel = this.handleItemEditCancel.bind(this)
   }
 
   componentDidMount() {
@@ -57,6 +58,7 @@ class TodoList extends Component {
                 id={item.id}
                 deleteItem={this.deleteItem}
                 editId={this.state.editId}
+                handleEditCancel={this.handleItemEditCancel}
                 handleEditClick={this.handleItemEditClick}
                 handleEditSubmit={this.handleItemEditSubmit}/>
     )
@@ -112,6 +114,12 @@ class TodoList extends Component {
     }
   }
 
+  handleItemEditCancel() {
+    this.setState({
+      editId: null
+    })
+  }
+
   render() {
     return (
       <div>
@@ -123,9 +131,9 @@ class TodoList extends Component {
           </label>
           <input type="submit" value="Add" />
         </form>
-        <ul>
+        <table>
           {this.state.items.map(this.returnListElement)}
-        </ul>
+        </table>
       </div>
     )
   }

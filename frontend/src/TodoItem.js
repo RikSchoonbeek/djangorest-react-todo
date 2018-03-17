@@ -9,6 +9,7 @@ class TodoItem extends Component {
     }
     this.delete = this.delete.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.editCancel = this.editCancel.bind(this)
     this.editClick = this.editClick.bind(this)
     this.editSubmit = this.editSubmit.bind(this)
   }
@@ -35,6 +36,10 @@ class TodoItem extends Component {
     this.props.handleEditSubmit(this.props.id, this.state.editedTitle)
   }
 
+  editCancel(event) {
+    this.props.handleEditCancel()
+  }
+
   renderInputField() {
     return (
       <form onSubmit={this.editSubmit}>
@@ -43,7 +48,7 @@ class TodoItem extends Component {
                defaultValue={this.props.title}
                id="editItemInputField" />
         <input type="submit" value="update" />
-        <button>cancel</button>
+        <button type="button" onClick={this.editCancel}>cancel</button>
       </form>
     )
   }
@@ -58,10 +63,11 @@ class TodoItem extends Component {
         listElementContent = this.props.title
       }
     return (
-      <li>{ listElementContent }
-        <button onClick={this.delete}>del</button>
-        <button onClick={this.editClick}>edit</button>
-      </li>
+      <tr>
+        <td><button onClick={this.delete}>del</button></td>
+        <td><button onClick={this.editClick}>edit</button></td>
+        <td>{ listElementContent }</td>
+      </tr>
     )
   }
 }
